@@ -2,7 +2,7 @@
 
 import moment from "moment";
 import Image from "next/image";
-import { useReducer } from "react";
+import React, { useReducer } from "react";
 
 type ChatMessage = {
   text: string;
@@ -12,7 +12,9 @@ type ChatMessage = {
 
 type Action = {
   type: 'FETCH_INIT' | 'FETCH_SUCCESS' | 'FETCH_ERROR' | 'ADD_MESSAGE' | 'SET_PROMPT'
-  payload?: string | ChatMessage;
+  prompt?: string;
+  error?: string;
+  chatMessage?: ChatMessage;
 };
 
 type State = {
@@ -39,12 +41,12 @@ const dataFetchReducer = (state: State, action: Action): State => {
       return {
         ...state,
         isLoading: false,
-        error: String(action.payload)
+        error: String(action.error)
       };
     case 'ADD_MESSAGE':
       const newMessage: ChatMessage = {
-        text: String(action?.payload?.text),
-        author: action?.payload?.author || 'GPT',
+        text: String(action?.chatMessage?.text),
+        author: action?.chatMessage?.author || 'GPT',
         timestamp: moment()
       };
       return {
@@ -54,7 +56,7 @@ const dataFetchReducer = (state: State, action: Action): State => {
     case 'SET_PROMPT':
       return {
         ...state,
-        prompt: String(action.payload)
+        prompt: String(action.prompt)
       };
     default:
       throw new Error();
@@ -74,20 +76,20 @@ export default function Page() {
   });
 
   const handlePromptChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch({ type: 'SET_PROMPT', payload: event.target.value });
+    dispatch({ type: 'SET_PROMPT', prompt: event.target.value });
   };
   const handleSendMessage = async () => {
     dispatch({ type: 'FETCH_INIT' });
-    dispatch({ type: 'SET_PROMPT', payload: '' });
-    dispatch({ type: 'ADD_MESSAGE', payload: { text: prompt, author: 'me' } });
+    dispatch({ type: 'SET_PROMPT', prompt: '' });
+    dispatch({ type: 'ADD_MESSAGE', chatMessage: { text: prompt, author: 'me' } });
     try {
       const response = await fetch('/api/promptCompletion', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt: prompt }) })
       const data = await response.json();
-      dispatch({ type: 'ADD_MESSAGE', payload: { text: String(data.gptMessage) } });
-      dispatch({ type: 'FETCH_SUCCESS', payload: data.gptMessage });
+      dispatch({ type: 'ADD_MESSAGE', chatMessage: { text: String(data.gptMessage) } });
+      dispatch({ type: 'FETCH_SUCCESS' });
 
     } catch (error) {
-      dispatch({ type: 'FETCH_ERROR', payload: error });
+      dispatch({ type: 'FETCH_ERROR', error: 'Error in handleSendMessage' });
     }
   };
 

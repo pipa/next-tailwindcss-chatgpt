@@ -14,8 +14,10 @@ export const generateText = async (prompt: string) => {
       prompt,
       max_tokens: Number(process.env.OPEN_AI_MAX_TOKENS)
     }, {
-      timeout: 10000
+      timeout: 15000
     });
+
+    console.log(gptResponse.data)
 
     return gptResponse;
   } catch (error) {

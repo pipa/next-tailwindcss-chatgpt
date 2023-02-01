@@ -1,4 +1,5 @@
 // These styles apply to every route in the application
+import React from 'react';
 import './globals.css';
 import Head from './head';
 
@@ -12,7 +13,7 @@ export default function RootLayout({
       <head>
         <Head />
       </head>
-      <body className="flex flex-col items-center justify-center w-screen min-h-screen bg-default text-gray-800 p-10">
+      <body className="bg-default h-screen">
         {children}
       </body>
     </html>

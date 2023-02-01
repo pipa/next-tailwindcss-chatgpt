@@ -64,7 +64,7 @@ export const chatReducer = (state: AppState, action: Action): AppState => {
   }
 };
 
-export const ChatProvider = ({ children }) => {
+export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   const [state, dispatch] = useReducer(chatReducer, defaultState);
 
   useEffect(() => {

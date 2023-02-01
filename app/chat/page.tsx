@@ -1,7 +1,7 @@
 'use client';
 
 import React from "react";
-import ComposeBox from "./composeBox";
+import ComposeBox from "./ComposeBox";
 import ConversationHeader from './ConversationHeader';
 import Conversation from './Conversation';
 

@@ -1,12 +1,13 @@
 'use client';
 
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import Image from "next/image";
 import { useChat } from "./state";
 import { ActionTypes, ChatMessage, Users } from "../types";
 
 export default function ComposeBox() {
   const [{ isLoading, chatMessages }, dispatch] = useChat();
+  const promptRef = useRef<HTMLInputElement>(null);
   const handleError = () => {
     dispatch({ type: ActionTypes.FETCH_ERROR, chatMessage: { text: 'Error in handleSendMessage', isError: true } });
   };
@@ -15,12 +16,12 @@ export default function ComposeBox() {
     event.preventDefault();
 
     const chatMessage: ChatMessage = {
-      text: event.currentTarget.prompt.value,
+      text: promptRef.current!.value,
       author: Users.USERNAME,
       isError: false
     };
     const prompt = [...chatMessages, ...[chatMessage]].map(message => `${message.author}: ${message.text}\n`).join(' ');
-    event.currentTarget.reset();
+    promptRef.current!.value = '';
     dispatch({ type: ActionTypes.FETCH_INIT, chatMessage });
 
     console.log(prompt);
@@ -36,16 +37,20 @@ export default function ComposeBox() {
 
       dispatch({ type: ActionTypes.ADD_MESSAGE, chatMessage: { text: String(data.gptMessage.replace('GPT:', '')), isError: false } });
       dispatch({ type: ActionTypes.FETCH_SUCCESS });
-
+      promptRef.current?.focus();
     } catch (error) {
       return handleError();
     }
   };
 
+  useEffect(() => {
+    promptRef.current?.focus();
+  }, [])
+
   return (
     <form className="bg-panel text-placeholder h-16 px-1 py-4 flex items-center" onSubmit={handleSendMessage}>
       <div className="flex-1 mx-2">
-        <input className="w-full border-input rounded px-2 py-2 text-slate-200 bg-input placeholder:text-placeholder" type="text" placeholder="Type a message" disabled={isLoading} name="prompt" />
+        <input ref={promptRef} className="w-full border-input rounded px-2 py-2 text-slate-200 bg-input placeholder:text-placeholder" type="text" placeholder="Type a message" name="prompt" />
       </div>
       <div className="flex-initial mx-1">
         <button disabled={isLoading}>

@@ -1,11 +1,5 @@
-import React from "react";
+import { redirect } from "next/navigation";
 
-const Page: React.FC = () => {
-  return (
-    <div className="flex flex-col flex-grow w-full max-w-5xl shadow-xl rounded-lg overflow-hidden">
-      Something
-    </div>
-  )
+export default function Page() {
+  redirect('/chat');
 }
-
-export default Page;
